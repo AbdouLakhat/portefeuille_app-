@@ -10,7 +10,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -35,17 +34,13 @@ class _SplashScreenState extends State<SplashScreen> {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              AppColors.cardGradientStart,
-              AppColors.cardGradientEnd,
-            ],
+            colors: [AppColors.cardGradientStart, AppColors.cardGradientEnd],
           ),
         ),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-
               // Icône / Logo
               Container(
                 width: 100,
@@ -87,10 +82,7 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: AppSizes.xl),
 
               // Indicateur de chargement
-              const CircularProgressIndicator(
-                color: AppColors.white,
-              ),
-
+              const CircularProgressIndicator(color: AppColors.white),
             ],
           ),
         ),
