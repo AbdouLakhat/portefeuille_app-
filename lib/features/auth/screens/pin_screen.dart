@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/auth_provider.dart';
 
 // Le mode du PIN : connexion ou inscription
 enum PinMode { login, register }
@@ -67,47 +69,67 @@ class _PinScreenState extends State<PinScreen> {
 
   // Vérification PIN pour la CONNEXION
   void _verifyLogin() async {
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
+  final auth = Provider.of<AuthProvider>(context, listen: false);
+  
+  setState(() => _isLoading = true);
+  await Future.delayed(const Duration(milliseconds: 500));
+  setState(() => _isLoading = false);
 
-    // Pour l'instant on accepte n'importe quel PIN
-    // Plus tard on vérifiera avec les vraies données
+  // Vérification du vrai PIN
+  if (auth.verifyPin(_pin)) {
     if (mounted) {
       Navigator.pushReplacementNamed(context, '/home');
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Code PIN incorrect ❌'),
+        backgroundColor: AppColors.error,
+      ),
+    );
+    setState(() => _pin = '');
   }
+}
 
   // Vérification PIN pour l'INSCRIPTION
   void _verifyRegister() async {
-    if (_pin == _confirmPin) {
-      setState(() => _isLoading = true);
-      await Future.delayed(const Duration(seconds: 1));
-      setState(() => _isLoading = false);
+  if (_pin == _confirmPin) {
+    // Récupérer les arguments passés depuis Register
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Compte créé avec succès !'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        Navigator.pushReplacementNamed(context, '/home');
-      }
-    } else {
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    
+    // Enregistrement réel de l'utilisateur
+    auth.register(
+      args['nom'],
+      args['telephone'],
+      args['cni'],
+      _pin, // Le PIN choisi
+    );
+
+    if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Les PIN ne correspondent pas, réessayez'),
-          backgroundColor: AppColors.error,
+          content: Text('Compte créé avec succès ! 🎉'),
+          backgroundColor: AppColors.success,
         ),
       );
-      setState(() {
-        _pin        = '';
-        _confirmPin = '';
-        _isConfirming = false;
-      });
+      Navigator.pushReplacementNamed(context, '/home');
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Les PIN ne correspondent pas'),
+        backgroundColor: AppColors.error,
+      ),
+    );
+    setState(() {
+      _pin = '';
+      _confirmPin = '';
+      _isConfirming = false;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {

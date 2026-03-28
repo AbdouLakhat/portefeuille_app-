@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
               // Nom de l'app
               const Text(
-                'MonPortefeuille',
+                'SENPAY',
                 style: TextStyle(
                   fontSize: AppSizes.fontXxl,
                   fontWeight: FontWeight.bold,

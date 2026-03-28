@@ -72,7 +72,7 @@ class _LoginTelephoneScreenState extends State<LoginTelephoneScreen> {
 
               const Center(
                 child: Text(
-                  'Bienvenue dans MonPortefeuille',
+                  'Bienvenue dans SENPAY',
                   style: TextStyle(
                     fontSize: AppSizes.fontXxl,
                     fontWeight: FontWeight.bold,

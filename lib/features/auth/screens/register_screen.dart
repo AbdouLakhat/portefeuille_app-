@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import 'package:provider/provider.dart';
+import '../../../providers/auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -13,39 +15,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nomController = TextEditingController();
   final TextEditingController _prenomController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _cniController = TextEditingController();
   bool _isLoading = false;
-
+  
+  // Fonction pour afficher un message d'erreur ou succès
+void _showMessage(String message, Color color) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: color,
+    ),
+  );
+}
   void _register() async {
     if (_nomController.text.isEmpty ||
         _prenomController.text.isEmpty ||
-        _phoneController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Veuillez remplir tous les champs'),
-          backgroundColor: AppColors.error,
-        ),
-      );
+        _phoneController.text.isEmpty ||
+        _cniController.text.isEmpty) {
+      _showMessage('Veuillez remplir tous les champs', AppColors.error);
       return;
     }
 
-    if (_phoneController.text.length < 9) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Numéro de téléphone invalide'),
-          backgroundColor: AppColors.error,
-        ),
-      );
-      return;
-    }
-
-    // Simule un chargement
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isLoading = false);
 
-    // Redirige vers la création du PIN
     if (mounted) {
-      Navigator.pushReplacementNamed(context, '/pin-register');
+      // On passe les infos vers l'écran PIN
+      Navigator.pushReplacementNamed(
+        context,
+        '/pin-register',
+        arguments: {
+          'nom': '${_prenomController.text} ${_nomController.text}',
+          'telephone': _phoneController.text,
+          'cni': _cniController.text,
+        },
+      );
     }
   }
 
@@ -124,6 +129,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 decoration: const InputDecoration(
                   hintText: '77 123 45 67',
                   prefixIcon: Icon(Icons.phone, color: AppColors.primary),
+                ),
+              ),
+              // Champ CNI
+              _buildLabel('Numéro de pièce d\'identité (CNI)'),
+              const SizedBox(height: AppSizes.sm),
+              TextField(
+                controller: _cniController,
+                decoration: const InputDecoration(
+                  hintText: 'Ex: 1234567890123',
+                  prefixIcon: Icon(
+                    Icons.badge_outlined,
+                    color: AppColors.primary,
+                  ),
                 ),
               ),
 
